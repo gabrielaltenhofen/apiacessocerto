@@ -45,7 +45,7 @@ server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
   });
 });
 
-server.get('/registrar_ponto', (req, res) => {
+server.get('/entrada-tag', (req, res) => {
   const tagUsuario = req.query.usuario; // Tag do funcionário
 
   if (!tagUsuario) {
@@ -68,7 +68,7 @@ server.get('/registrar_ponto', (req, res) => {
     const statusUsuario = funcionarioEncontrado.status;
 
     if (statusUsuario !== 'Ativo') {
-      return res.status(400).json({ error: 'Usuário inativo. Não é possível registrar ponto.' });
+      return res.status(400).json({ error: 'Usuário inativo. Não é possível liberar acesso!' });
     }
 
     const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
@@ -77,18 +77,14 @@ server.get('/registrar_ponto', (req, res) => {
     const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
     const dia = dataHoraBrasilia.getDate().toString().padStart(2, '0'); // Dia com dois dígitos
 
-    const ref = db.ref(`batidas_de_ponto/${tagUsuario}/${ano}/${mes}/${dia}`);
+    const ref = db.ref(`acessoTag/${tagUsuario}/${ano}/${mes}/${dia}`);
 
     // Verifique o número de batidas já registradas para o dia
     ref.once('value', (snapshot) => {
       const batidasDoDia = snapshot.numChildren();
 
-      if (batidasDoDia >= 10) {
-        return res.status(400).json({ error: 'Limite de batidas de ponto para o dia atingido (máximo 10).' });
-      }
-
       // Determine o nome da variável para a nova batida
-      const nomeVariavelNovaBatida = `batida${batidasDoDia + 1}`;
+      const nomeVariavelNovaBatida = `entrada${batidasDoDia + 1}`;
       const horaAtual = hora;
 
       const novaBatida = {
