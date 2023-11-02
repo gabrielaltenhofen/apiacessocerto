@@ -156,32 +156,23 @@ server.get('/usuarios/tag/:tag', (req, res) => {
   });
 });
 // Rota para verificar o valor no Firebase
-server.get('/verificar-valor/:valor', async (req, res) => {
-  try {
-    // Referência ao caminho da variável no Firebase
-    const db = admin.database();
-    const ref = db.ref('/tabelaCodigos/codigo');
+let codigoGeradoNoSite; // Variável global para armazenar o código gerado no site
 
-    // Lê o valor da variável no Firebase
-    ref.once('value', (snapshot) => {
-      const valorDoFirebase = snapshot.val();
-      
-      // Exibe o valor do Firebase
-      res.json({ valorNoFirebase: valorDoFirebase });
+// Rota para receber o código do ESP32 e compará-lo com o código gerado no site (usando GET)
+server.get('/verificar-codigo/:codigo', (req, res) => {
+    const codigoRecebido = req.params.codigo;
 
-      const valorDaRequisicao = req.params.valor;
+    if (codigoRecebido === codigoGeradoNoSite) {
+        res.json({ resultado: 'Acesso liberado' });
+    } else {
+        res.status(400).json({ resultado: 'Acesso negado' });
+    }
+});
 
-      // Comparando os valores
-      if (valorDaRequisicao === valorDoFirebase) {
-        res.json({ resultado: 'Valores são iguais' });
-      } else {
-        res.json({ resultado: 'Valores são diferentes' });
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Erro ao verificar o valor no Firebase' });
-  }
+// Rota para atualizar o código gerado no site (usando GET)
+server.get('/atualizar-codigo/:codigo', (req, res) => {
+    codigoGeradoNoSite = req.params.codigo;
+    res.json({ resultado: 'Código atualizado' });
 });
 
 
