@@ -159,10 +159,14 @@ server.get('/usuarios/tag/:tag', (req, res) => {
 server.get('/verificar-codigo/:codigo', async (req, res) => {
   const codigoParam = req.params.codigo;
 
+  console.log('Código da URL:', codigoParam);
+
   try {
     // Recuperar o código do Firebase Realtime Database
     const snapshot = await admin.database().ref('/tabelaCodigos/codigoAtivo').once('value');
     const codigoFirebase = snapshot.val();
+    
+    console.log('Código do Firebase:', codigoFirebase);
 
     // Comparar o código do parâmetro com o código do Firebase
     if (codigoParam === codigoFirebase) {
@@ -175,6 +179,7 @@ server.get('/verificar-codigo/:codigo', async (req, res) => {
     res.status(500).json({ mensagem: 'Erro ao verificar o código' });
   }
 });
+
 
 
 server.use(router);
