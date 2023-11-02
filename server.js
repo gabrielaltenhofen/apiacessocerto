@@ -155,40 +155,23 @@ server.get('/usuarios/tag/:tag', (req, res) => {
     res.json(funcionario);
   });
 });
-
-server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
+// Rota para verificar o valor da variável no Firebase
+server.get('/verificar-valor', async (req, res) => {
   try {
-    const { codigoAtivo } = req.params;
+    // Referência ao caminho da variável que você deseja verificar
     const db = admin.database();
-    const ref = db.ref('tabelaCodigos');
+    const ref = db.ref('/tabelaCodigos/codigo');
 
-    // Faça uma consulta para obter o valor desejado a partir do Firebase
-    const valorDesejadoSnapshot = await ref.child('codigoAtivo').once('value');
-    const valorDesejado = valorDesejadoSnapshot.val();
-
-    console.log('Valor desejado do Firebase:', valorDesejado); // Imprime o valor no console
-
-    // Verifique se o código de ativo é igual ao valor desejado
-    if (codigoAtivo === valorDesejado) {
-      res.json({ message: 'O código buscado é ativo' });
-    } else {
-      // Continue a verificar o banco de dados Firebase para o valor do código de ativo
-      const snapshot = await ref.child(codigoAtivo).once('value');
+    // Lê o valor da variável no Firebase
+    ref.once('value', (snapshot) => {
       const valor = snapshot.val();
-
-      // Verifique se o código de ativo é válido
-      if (valor !== null) {
-        res.json({ codigoAtivo, valor });
-      } else {
-        res.status(404).json({ error: 'Código de ativo inválido.' });
-      }
-    }
+      res.json({ valor });
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Erro ao ler o valor.' });
+    res.status(500).json({ error: 'Erro ao verificar o valor no Firebase' });
   }
 });
-
 
 
 
