@@ -54,7 +54,7 @@ server.get('/registrar_ponto', (req, res) => {
   }
 
   const db = admin.database();
-  const refUsuario = db.ref('funcionario').orderByChild('tag').equalTo(tagUsuario); // Referência ao usuário
+  const refUsuario = db.ref('usuarios').orderByChild('tag').equalTo(tagUsuario); // Referência ao usuário
 
   // Verifique o status do usuário
   refUsuario.once('value', (snapshotUsuario) => {
