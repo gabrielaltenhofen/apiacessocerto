@@ -155,10 +155,8 @@ server.get('/usuarios/tag/:tag', (req, res) => {
     res.json(funcionario);
   });
 });
-// Rota para verificar o valor da variável no Firebase
+// Rota para verificar o valor no Firebase
 server.get('/verificar-valor/:valor', async (req, res) => {
-  const valorDaRequisicao = req.params.valor;
-
   try {
     // Referência ao caminho da variável no Firebase
     const db = admin.database();
@@ -168,6 +166,11 @@ server.get('/verificar-valor/:valor', async (req, res) => {
     ref.once('value', (snapshot) => {
       const valorDoFirebase = snapshot.val();
       
+      // Exibe o valor do Firebase
+      res.json({ valorNoFirebase: valorDoFirebase });
+
+      const valorDaRequisicao = req.params.valor;
+
       // Comparando os valores
       if (valorDaRequisicao === valorDoFirebase) {
         res.json({ resultado: 'Valores são iguais' });
@@ -180,7 +183,6 @@ server.get('/verificar-valor/:valor', async (req, res) => {
     res.status(500).json({ error: 'Erro ao verificar o valor no Firebase' });
   }
 });
-
 
 
 server.use(router);
