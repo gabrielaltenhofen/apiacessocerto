@@ -156,16 +156,24 @@ server.get('/usuarios/tag/:tag', (req, res) => {
   });
 });
 // Rota para verificar o valor da variável no Firebase
-server.get('/verificar-valor', async (req, res) => {
+server.get('/verificar-valor/:valor', async (req, res) => {
+  const valorDaRequisicao = req.params.valor;
+
   try {
-    // Referência ao caminho da variável que você deseja verificar
+    // Referência ao caminho da variável no Firebase
     const db = admin.database();
     const ref = db.ref('/tabelaCodigos/codigo');
 
     // Lê o valor da variável no Firebase
     ref.once('value', (snapshot) => {
-      const valor = snapshot.val();
-      res.json({ valor });
+      const valorDoFirebase = snapshot.val();
+      
+      // Comparando os valores
+      if (valorDaRequisicao === valorDoFirebase) {
+        res.json({ resultado: 'Valores são iguais' });
+      } else {
+        res.json({ resultado: 'Valores são diferentes' });
+      }
     });
   } catch (error) {
     console.error(error);
