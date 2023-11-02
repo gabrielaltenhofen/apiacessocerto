@@ -160,13 +160,25 @@ let codigoGeradoNoSite; // Variável global para armazenar o código gerado no s
 
 // Rota para receber o código do ESP32 e compará-lo com o código gerado no site (usando GET)
 server.get('/verificar-codigo/:codigo', (req, res) => {
-    const codigoRecebido = req.params.codigo;
+  const codigoRecebido = req.params.codigo;
 
-    if (codigoRecebido === codigoGeradoNoSite) {
-        res.json({ resultado: 'Acesso liberado' });
-    } else {
-        res.status(400).json({ resultado: 'Acesso negado' });
-    }
+  if (codigoRecebido === codigoGeradoNoSite) {
+      // Acesso liberado, registre a hora e data no Firebase
+      const timestamp = new Date().toISOString(); // Obtém a data e hora atual
+
+      const db = admin.database();
+      const ref = db.ref('acessoCodigo'); // Referência para a tabela acessoCodigo
+
+      // Crie um novo nó com a data e hora no Firebase
+      const newAccessRef = ref.push();
+      newAccessRef.set({
+          timestamp: timestamp
+      });
+
+      res.json({ resultado: 'Acesso liberado' });
+  } else {
+      res.status(400).json({ resultado: 'Acesso negado' });
+  }
 });
 
 // Rota para atualizar o código gerado no site (usando GET)
