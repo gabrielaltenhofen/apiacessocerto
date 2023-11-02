@@ -160,12 +160,12 @@ server.get('/usuarios/tag/:tag', (req, res) => {
 server.get('/verificar-acesso/:codigo', (req, res) => {
   const codigoFornecido = req.params.codigo;
   const database = admin.database();
-  const codigoRef = database.ref('codigo-ativo');
+  const tabelaCodigosRef = database.ref('tabelaCodigos'); // Nomeie a tabela conforme sua preferência
 
-  codigoRef.once('value', (snapshot) => {
-      const codigoAtivo = snapshot.val();
+  tabelaCodigosRef.once('value', (snapshot) => {
+      const tabelaCodigos = snapshot.val();
 
-      if (codigoFornecido === codigoAtivo) {
+      if (tabelaCodigos && tabelaCodigos.codigoAtivo === codigoFornecido) {
           res.json({ acesso: 'Liberado' });
       } else {
           res.json({ acesso: 'Recusado' });
