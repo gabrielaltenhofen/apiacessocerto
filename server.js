@@ -162,22 +162,39 @@ server.get('/verificar-codigo/:codigo', (req, res) => {
     const codigoRecebido = req.params.codigo;
 
     if (codigoRecebido === codigoGeradoNoSite) {
-        // Acesso liberado, registre a hora e data no Firebase
-        const dataHoraAtual = new Date();
-        const dataFormatada = `${dataHoraAtual.getDate()}/${dataHoraAtual.getMonth() + 1}/${dataHoraAtual.getFullYear()}`;
-        const horaFormatada = `${dataHoraAtual.getHours()}:${dataHoraAtual.getMinutes()}`;
-        const dataHoraFormatada = `${horaFormatada} - ${dataFormatada}`;
-
-        const db = admin.database();
-        const ref = db.ref('acessoCodigo'); // Referência para a tabela acessoCodigo
-
-        // Crie um novo nó com a hora e data formatada no Firebase
-        const newAccessRef = ref.push();
-        newAccessRef.set({
-            timestamp: dataHoraFormatada
+      
+      const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
+      const hora = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const ano = dataHoraBrasilia.getFullYear();
+      const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
+      const dia = dataHoraBrasilia.getDate().toString().padStart(2, '0'); // Dia com dois dígitos
+  
+      const ref = db.ref(`acessoCodigo`);
+  
+      // Verifique o número de batidas já registradas para o dia
+      ref.once('value', (snapshot) => {
+        const batidasDoDia = snapshot.numChildren();
+  
+        // Determine o nome da variável para a nova batida
+        const nomeVariavelNovaBatida = `batida${batidasDoDia + 1}`;
+        const horaAtual = hora;
+  
+        const novaBatida = {
+          data_hora: horaAtual,
+        };
+  
+        // Use `child` para definir a nova batida
+        ref.child(nomeVariavelNovaBatida).set(novaBatida, (error) => {
+          if (error) {
+            console.error('Erro ao registrar ponto:', error);
+            res.status(500).json({ error: 'Erro interno do servidor' });
+          } else {
+            res.json({ message: 'Acesso Liberado!' });
+          }
         });
 
-        res.json({ resultado: 'Acesso liberado' });
+
+      });
     } else {
         res.status(400).json({ resultado: 'Acesso negado' });
     }
