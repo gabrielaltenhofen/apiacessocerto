@@ -27,8 +27,6 @@ function ajustarHoraParaBrasilia(data) {
   return dataBrasilia;
 }
 
-// Defina a rota para recuperar dados de batidas de ponto por funcionário, mês e dia
-// Defina a rota para recuperar todas as batidas de um mês específico
 server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
   const usuario = req.params.usuario;
   const ano = parseInt(req.params.ano);
@@ -46,6 +44,7 @@ server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
     res.json(data);
   });
 });
+
 server.get('/registrar_ponto', (req, res) => {
   const tagUsuario = req.query.usuario; // Tag do funcionário
 
@@ -155,30 +154,33 @@ server.get('/usuarios/tag/:tag', (req, res) => {
     res.json(funcionario);
   });
 });
-// Rota para verificar o valor no Firebase
+
 let codigoGeradoNoSite; // Variável global para armazenar o código gerado no site
 
 // Rota para receber o código do ESP32 e compará-lo com o código gerado no site (usando GET)
 server.get('/verificar-codigo/:codigo', (req, res) => {
-  const codigoRecebido = req.params.codigo;
+    const codigoRecebido = req.params.codigo;
 
-  if (codigoRecebido === codigoGeradoNoSite) {
-      // Acesso liberado, registre a hora e data no Firebase
-      const timestamp = new Date().toISOString(); // Obtém a data e hora atual
+    if (codigoRecebido === codigoGeradoNoSite) {
+        // Acesso liberado, registre a hora e data no Firebase
+        const dataHoraAtual = new Date();
+        const dataFormatada = `${dataHoraAtual.getDate()}/${dataHoraAtual.getMonth() + 1}/${dataHoraAtual.getFullYear()}`;
+        const horaFormatada = `${dataHoraAtual.getHours()}:${dataHoraAtual.getMinutes()}`;
+        const dataHoraFormatada = `${horaFormatada} - ${dataFormatada}`;
 
-      const db = admin.database();
-      const ref = db.ref('acessoCodigo'); // Referência para a tabela acessoCodigo
+        const db = admin.database();
+        const ref = db.ref('acessoCodigo'); // Referência para a tabela acessoCodigo
 
-      // Crie um novo nó com a data e hora no Firebase
-      const newAccessRef = ref.push();
-      newAccessRef.set({
-          timestamp: timestamp
-      });
+        // Crie um novo nó com a hora e data formatada no Firebase
+        const newAccessRef = ref.push();
+        newAccessRef.set({
+            timestamp: dataHoraFormatada
+        });
 
-      res.json({ resultado: 'Acesso liberado' });
-  } else {
-      res.status(400).json({ resultado: 'Acesso negado' });
-  }
+        res.json({ resultado: 'Acesso liberado' });
+    } else {
+        res.status(400).json({ resultado: 'Acesso negado' });
+    }
 });
 
 // Rota para atualizar o código gerado no site (usando GET)
