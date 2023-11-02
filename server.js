@@ -27,7 +27,7 @@ function ajustarHoraParaBrasilia(data) {
   return dataBrasilia;
 }
 
-server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
+server.get('/acessoTag/:usuario/:ano/:mes', (req, res) => {
   const usuario = req.params.usuario;
   const ano = parseInt(req.params.ano);
   const mes = parseInt(req.params.mes);
@@ -37,7 +37,7 @@ server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
   }
 
   const db = admin.database();
-  const ref = db.ref(`batidas_de_ponto/${usuario}/${ano}/${mes}`);
+  const ref = db.ref(`acessoTag/${usuario}/${ano}/${mes}`);
 
   ref.once('value', (snapshot) => {
     const data = snapshot.val();
