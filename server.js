@@ -157,6 +157,22 @@ server.get('/usuarios/tag/:tag', (req, res) => {
 });
 
 
+server.get('/verificar-acesso/:codigo', (req, res) => {
+  const codigoFornecido = req.params.codigo;
+  const database = admin.database();
+  const codigoRef = database.ref('codigo-ativo');
+
+  codigoRef.once('value', (snapshot) => {
+      const codigoAtivo = snapshot.val();
+
+      if (codigoFornecido === codigoAtivo) {
+          res.json({ acesso: 'Liberado' });
+      } else {
+          res.json({ acesso: 'Recusado' });
+      }
+  });
+});
+
 
 server.use(router);
 
