@@ -157,7 +157,7 @@ server.get('/usuarios/tag/:tag', (req, res) => {
 });
 
 
-server.get('/verificar-acesso/:codigo', (req, res) => {
+app.get('/verificar-acesso/:codigo', (req, res) => {
   const codigoFornecido = req.params.codigo;
   const database = admin.database();
   const codigoRef = database.ref('codigo-ativo');
