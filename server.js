@@ -162,17 +162,23 @@ server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
     const { codigoAtivo } = req.params;
     const db = admin.database();
     const ref = db.ref('tabelaCodigos');
-    
+
     // Faça a consulta no banco de dados Firebase
     const snapshot = await ref.child(codigoAtivo).once('value');
     const valor = snapshot.val();
-    
-    res.json({ codigoAtivo, valor });
+
+    // Verifique se o código de ativo é válido
+    if (valor !== null) {
+      res.json({ codigoAtivo, valor });
+    } else {
+      res.status(404).json({ error: 'Código de ativo inválido.' });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Erro ao ler o valor.' });
   }
 });
+
 
 
 server.use(router);
