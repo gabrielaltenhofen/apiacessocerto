@@ -156,7 +156,7 @@ server.get('/usuarios/tag/:tag', (req, res) => {
   });
 });
 
-app.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
+server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
   try {
     const { codigoAtivo } = req.params;
     const db = admin.database();
