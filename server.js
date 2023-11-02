@@ -156,7 +156,7 @@ server.get('/usuarios/tag/:tag', (req, res) => {
   });
 });
 
-server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
+app.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
   try {
     const { codigoAtivo } = req.params;
     const db = admin.database();
@@ -165,6 +165,8 @@ server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
     // Faça uma consulta para obter o valor desejado a partir do Firebase
     const valorDesejadoSnapshot = await ref.child('codigoAtivo').once('value');
     const valorDesejado = valorDesejadoSnapshot.val();
+
+    console.log('Valor desejado do Firebase:', valorDesejado); // Imprime o valor no console
 
     // Verifique se o código de ativo é igual ao valor desejado
     if (codigoAtivo === valorDesejado) {
@@ -186,7 +188,6 @@ server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
     res.status(500).json({ error: 'Erro ao ler o valor.' });
   }
 });
-
 
 
 
