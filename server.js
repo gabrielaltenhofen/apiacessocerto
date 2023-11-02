@@ -191,6 +191,7 @@ server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
 
 
 
+
 server.use(router);
 
 server.listen(3000, () => {
