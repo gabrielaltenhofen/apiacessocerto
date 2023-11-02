@@ -110,9 +110,9 @@ server.get('/registrar_ponto', (req, res) => {
 });
 
 // Defina a rota para listar todos os funcionários com suas tags e nomes
-server.get('/funcionario', (req, res) => {
+server.get('/usuarios', (req, res) => {
   const db = admin.database();
-  const ref = db.ref('funcionario'); // Use o nome correto da tabela, que é 'funcionario'.
+  const ref = db.ref('usuarios'); // Use o nome correto da tabela, que é 'funcionario'.
 
   ref.once('value', (snapshot) => {
     const funcionarios = snapshot.val();
@@ -131,7 +131,7 @@ server.get('/funcionario', (req, res) => {
 
 
 // Defina a rota para buscar um funcionário pela tag
-server.get('/funcionario/tag/:tag', (req, res) => {
+server.get('/usuarios/tag/:tag', (req, res) => {
   const tag = req.params.tag;
 
   if (!tag) {
@@ -139,7 +139,7 @@ server.get('/funcionario/tag/:tag', (req, res) => {
   }
 
   const db = admin.database();
-  const ref = db.ref('funcionario');
+  const ref = db.ref('usuarios');
 
   ref.orderByChild('tag').equalTo(tag).once('value', (snapshot) => {
     const funcionarios = snapshot.val();
