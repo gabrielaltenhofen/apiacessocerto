@@ -156,21 +156,24 @@ server.get('/usuarios/tag/:tag', (req, res) => {
   });
 });
 
+server.get('/verificar-codigo/:codigo', async (req, res) => {
+  const codigoParam = req.params.codigo;
 
-server.get('/verificar-acesso/:codigo', (req, res) => {
-  const codigoFornecido = req.params.codigo;
-  const database = admin.database();
-  const tabelaCodigosRef = database.ref('tabelaCodigos'); // Nomeie a tabela conforme sua preferência
+  try {
+    // Recuperar o código do Firebase Realtime Database
+    const snapshot = await admin.database().ref('/tabelaCodigos/codigoAtivo').once('value');
+    const codigoFirebase = snapshot.val();
 
-  tabelaCodigosRef.once('value', (snapshot) => {
-      const tabelaCodigos = snapshot.val();
-
-      if (tabelaCodigos && tabelaCodigos.codigoAtivo === codigoFornecido) {
-          res.json({ acesso: 'Liberado' });
-      } else {
-          res.json({ acesso: 'Recusado' });
-      }
-  });
+    // Comparar o código do parâmetro com o código do Firebase
+    if (codigoParam === codigoFirebase) {
+      res.json({ mensagem: 'Código válido' });
+    } else {
+      res.status(403).json({ mensagem: 'Código inválido' });
+    }
+  } catch (error) {
+    console.error('Erro ao verificar o código:', error);
+    res.status(500).json({ mensagem: 'Erro ao verificar o código' });
+  }
 });
 
 
