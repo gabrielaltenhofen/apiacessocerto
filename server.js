@@ -156,7 +156,6 @@ server.get('/usuarios/tag/:tag', (req, res) => {
   });
 });
 
-
 server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
   try {
     const { codigoAtivo } = req.params;
@@ -178,7 +177,6 @@ server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
     res.status(500).json({ error: 'Erro ao ler o valor.' });
   }
 });
-
 
 
 
