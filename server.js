@@ -159,18 +159,24 @@ server.get('/usuarios/tag/:tag', (req, res) => {
 server.get('/api/ler-valor/:codigoAtivo', async (req, res) => {
   try {
     const { codigoAtivo } = req.params;
-    const db = admin.database();
-    const ref = db.ref('tabelaCodigos');
+    const valorDesejado = "462777"; // Valor desejado a ser comparado
 
-    // Faça a consulta no banco de dados Firebase
-    const snapshot = await ref.child(codigoAtivo).once('value');
-    const valor = snapshot.val();
-
-    // Verifique se o código de ativo é válido
-    if (valor !== null) {
-      res.json({ codigoAtivo, valor });
+    if (codigoAtivo === valorDesejado) {
+      res.json({ message: 'O código buscado é ativo' });
     } else {
-      res.status(404).json({ error: 'Código de ativo inválido.' });
+      const db = admin.database();
+      const ref = db.ref('tabelaCodigos');
+
+      // Faça a consulta no banco de dados Firebase
+      const snapshot = await ref.child(codigoAtivo).once('value');
+      const valor = snapshot.val();
+
+      // Verifique se o código de ativo é válido
+      if (valor !== null) {
+        res.json({ codigoAtivo, valor });
+      } else {
+        res.status(404).json({ error: 'Código de ativo inválido.' });
+      }
     }
   } catch (error) {
     console.error(error);
