@@ -75,8 +75,8 @@ server.get('/entrada-tag', (req, res) => {
 
     const ref = db.ref(`acessoTag/${tagUsuario}`);
 
-    // Adicione a data e hora como uma string
-    ref.push(dataHoraString, (error) => {
+    // Defina a data e hora com um nome específico (entradaTag)
+    ref.update({ entradaTag: dataHoraString }, (error) => {
       if (error) {
         console.error('Erro ao registrar ponto:', error);
         res.status(500).json({ error: 'Erro interno do servidor' });
@@ -86,6 +86,7 @@ server.get('/entrada-tag', (req, res) => {
     });
   });
 });
+
 
 
 // Defina a rota para listar todos os funcionários com suas tags e nomes
