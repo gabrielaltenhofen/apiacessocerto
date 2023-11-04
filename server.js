@@ -75,17 +75,19 @@ server.get('/entrada-tag', (req, res) => {
 
     const ref = db.ref(`acessoTag/${tagUsuario}`);
 
-    // Defina a data e hora com um nome específico (entradaTag)
-    ref.update({ entradaTag: dataHoraString }, (error) => {
+    // Crie um novo nó com um timestamp como nome para cada entradaTag
+    const newEntryRef = ref.push();
+    newEntryRef.set({ entradaTag: dataHoraString }, (error) => {
       if (error) {
-        console.error('Erro ao registrar ponto:', error);
+        console.error('Erro ao autorizar o acesso:', error);
         res.status(500).json({ error: 'Erro interno do servidor' });
       } else {
-        res.json({ message: 'Batida de ponto registrada com sucesso!' });
+        res.json({ message: 'Entrada autorizada - Tag ativa!' });
       }
     });
   });
 });
+
 
 
 
