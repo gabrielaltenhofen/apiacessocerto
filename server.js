@@ -63,7 +63,6 @@ server.get('/entrada-tag', (req, res) => {
       return res.status(400).json({ error: 'Usuário não encontrado.' });
     }
 
-    // A resposta deve ser um objeto, pois estamos buscando um único funcionário com base na tag.
     const funcionarioEncontrado = Object.values(usuarioData)[0];
     const statusUsuario = funcionarioEncontrado.status;
 
@@ -72,37 +71,22 @@ server.get('/entrada-tag', (req, res) => {
     }
 
     const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
-    const hora = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const ano = dataHoraBrasilia.getFullYear();
-    const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
-    const dia = dataHoraBrasilia.getDate().toString().padStart(2, '0'); // Dia com dois dígitos
+    const dataHoraString = dataHoraBrasilia.toLocaleString('pt-BR');
 
-    const ref = db.ref(`acessoTag/${tagUsuario}/${ano}/${mes}/${dia}`);
+    const ref = db.ref(`acessoTag/${tagUsuario}`);
 
-    // Verifique o número de batidas já registradas para o dia
-    ref.once('value', (snapshot) => {
-      const batidasDoDia = snapshot.numChildren();
-
-      // Determine o nome da variável para a nova batida
-      const nomeVariavelNovaBatida = `entrada${batidasDoDia + 1}`;
-      const horaAtual = hora;
-
-      const novaBatida = {
-        data_hora: horaAtual,
-      };
-
-      // Use `child` para definir a nova batida
-      ref.child(nomeVariavelNovaBatida).set(novaBatida, (error) => {
-        if (error) {
-          console.error('Erro ao registrar ponto:', error);
-          res.status(500).json({ error: 'Erro interno do servidor' });
-        } else {
-          res.json({ message: 'Batida de ponto registrada com sucesso!' });
-        }
-      });
+    // Adicione a data e hora como uma string
+    ref.push(dataHoraString, (error) => {
+      if (error) {
+        console.error('Erro ao registrar ponto:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+      } else {
+        res.json({ message: 'Batida de ponto registrada com sucesso!' });
+      }
     });
   });
 });
+
 
 // Defina a rota para listar todos os funcionários com suas tags e nomes
 server.get('/usuarios', (req, res) => {
